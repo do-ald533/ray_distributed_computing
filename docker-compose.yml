@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  ray-head:
+    image: rayproject/ray:latest
+    container_name: ray-head
+    command: ["ray", "start", "--head", "--port=6379"]
+    ports:
+      - "6379:6379"
+      - "8265:8265"
+    networks:
+      - ray-network
+
+  ray-worker:
+    image: rayproject/ray:latest
+    depends_on:
+      - ray-head
+    command: ["ray", "start", "--address=ray-head:6379"]
+    deploy:
+      replicas: 2
+    networks:
+      - ray-network
+
+networks:
+  ray-network:
+    driver: bridge
